@@ -1,5 +1,5 @@
-from articles.schema.post_schema import posts_schema
-from articles.models import Post
+from articles.models.model_post import Post
+from articles.models.model_post import posts_schema, post_schema
 
 
 def get_all_post():

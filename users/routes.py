@@ -2,7 +2,8 @@ from flask import Blueprint, redirect, flash, url_for, render_template, request
 from flask_login import login_user, current_user, logout_user, login_required
 
 from articles import bcrypt, db
-from articles.models import User, Post
+from articles.models.model_post import Post
+from articles.models.model_user import User
 from articles.users.forms import RegistrationForm, LoginForm, ResetPasswordForm, RequestResetForm, UpdateAccountForm
 from articles.users.utils import send_reset_email, save_picture
 

@@ -4,7 +4,7 @@ from flask_login import current_user
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, FileField
 from wtforms.validators import DataRequired, EqualTo, Length, Email, ValidationError
 
-from articles.models import User
+from articles.models.model_user import User
 
 
 class RegistrationForm(FlaskForm):

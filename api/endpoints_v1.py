@@ -26,13 +26,6 @@ class Users(Resource):
         users = user_controller.get_all_users()
         return {'status': True, 'message': message, 'data': users}
 
-    def create(self):
-        """List all users"""
-        message = 'User list fetched successfully'
-        users = user_controller.get_all_users()
-        return {'status': True, 'message': message, 'data': users}
-
-
 
 @ns.route("/posts")
 @api.doc('Post from articles')
@@ -40,6 +33,18 @@ class Posts(Resource):
     """Post List"""
 
     def get(self):
+        """List all posts"""
+        message = 'Post list fetched successfully'
+        posts = post_controller.get_all_post()
+        return {'status': True, 'message': message, 'data': posts}
+
+
+@ns.route("/post/create", methods=['POST'])
+@api.doc('Create Post articles')
+class Posts(Resource):
+    """Post List"""
+
+    def create(self):
         """List all posts"""
         message = 'Post list fetched successfully'
         posts = post_controller.get_all_post()

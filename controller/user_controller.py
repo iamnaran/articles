@@ -1,5 +1,5 @@
-from articles.models import User
-from articles.schema.users_schema import users_schema
+from articles.models.model_user import User
+from articles.models.model_user import users_schema, user_schema
 
 
 def get_all_users():
