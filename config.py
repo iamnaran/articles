@@ -8,6 +8,5 @@ class Config:
     MAIL_USE_TLS = True
     MAIL_USERNAME = 'smartgov.app@gmail.com'
     MAIL_PASSWORD = '********'
-
-    'JWT_SECRET_KEY' = 'jwt-secret-string'
+    JWT_SECRET_KEY = 'jwt-secret-string'
 
