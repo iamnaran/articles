@@ -1,10 +1,13 @@
+import pdb
+
 from flask import Blueprint, request
 from flask_restx import Api, Resource, reqparse
 from marshmallow import ValidationError
 from flask import jsonify
 from articles import bcrypt
-from articles.models.User import User, UserSchema
+from articles.models.User import User, UserSchema, user_schema
 from articles.models.Post import Post
+from articles.models import RevokedToken
 from articles.apicontroller import user_controller, post_controller, auth_controller
 
 from flask_jwt import jwt_required, current_identity
@@ -105,13 +108,19 @@ class RegisterUser(Resource):
             hash_password = bcrypt.generate_password_hash(result['password']).decode('utf-8')
 
             user = User(username=result['username'], email=result['email'], password=hash_password)
-            status, message = auth_controller.registerUser(user)
+            status, message, registered_user = auth_controller.registerUser(user)
 
-            access_token = create_access_token(identity=user.id)
-            refresh_token = create_refresh_token(identity=user.id)
+            if status:
+                access_token = create_access_token(identity=user.id)
+                refresh_token = create_refresh_token(identity=user.id)
 
-            return {'status': status, 'message': message,
-                    'data': jsonify({'access_token': access_token, 'refresh_token': refresh_token})}
+                user_dict = {'access_token': access_token, 'refresh_token': refresh_token}
+                user_dict['user'] = registered_user
+
+                return jsonify({'status': status, 'message': message,
+                                'data': user_dict})
+            else:
+                return jsonify({'status': status, 'message': message})
 
             # return {'status': status, 'message': message, 'has_password': hash_password, 'username': result['username']}
 
@@ -119,7 +128,75 @@ class RegisterUser(Resource):
             return {'status': "status", 'message': err.messages}
 
 
-@jwt_required
+@ns.route("/token-refresh")
+@api.doc('Token Refresh')
+class TokenRefresh(Resource):
+    """
+    Token Refresh Api
+    """
+
+    @jwt_refresh_token_required
+    def post(self):
+        # Generating new access token
+        current_user = get_jwt_identity()
+
+        access_token = create_access_token(identity=current_user)
+
+        return {'access_token': access_token}
+
+
+@ns.route("/logout")
+@api.doc('Logout Api')
+class UserLogoutAccess(Resource):
+    """
+    User Logout Api
+    """
+
+    @jwt_required
+    def post(self):
+
+        jti = get_raw_jwt()['jti']
+
+        try:
+            # Revoking access token
+            revoked_token = RevokedToken(jti=jti)
+
+            revoked_token.add()
+
+            return {'status': False, 'message': 'Access token has been revoked'}
+
+        except:
+
+            return {'status': False, 'message': 'Something went wrong'}, 500
+
+
+@ns.route("/logout-refresh")
+@api.doc('Logout Api')
+class UserLogoutRefresh(Resource):
+    """
+    User Logout Refresh Api
+    """
+
+    @jwt_refresh_token_required
+    def post(self):
+
+        jti = get_raw_jwt()['jti']
+
+        try:
+
+            revoked_token = RevokedToken(jti=jti)
+
+            revoked_token.add()
+
+            pdb.set_trace()
+
+            return {'status': False, 'message': 'Refresh token has been revoked'}
+
+        except:
+
+            return {'status': False, 'message': 'Something went wrong'}, 500
+
+
 @ns.route("/post/create", methods=['POST'])
 @api.doc('Create Post articles')
 class Posts(Resource):
@@ -132,3 +209,14 @@ class Posts(Resource):
         message = 'Post list fetched successfully'
         posts = post_controller.get_all_post()
         return {'status': True, 'message': message, 'data': posts}
+
+
+@ns.route("/jwt-test", methods=['GET'])
+@api.doc('JWT TEST')
+class SecretResource(Resource):
+    @jwt_required
+    def get(self):
+        return {
+            'answer': 42
+        }
+

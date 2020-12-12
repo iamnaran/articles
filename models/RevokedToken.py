@@ -2,7 +2,7 @@ from datetime import datetime
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from marshmallow import fields
 
-from articles.models.User import  User
+from articles.models.User import User
 
 from articles import db
 
@@ -16,7 +16,6 @@ class Blacklist(db.Model):
 
     def add(self):
         db.session.add(self)
-
         db.session.commit()
 
     @classmethod
@@ -31,8 +30,7 @@ class Blacklist(db.Model):
 class TokenSchema(SQLAlchemyAutoSchema):
     class Meta:
         # Fields to expose
-        model = Post
-        include_relationships = True
+        model = Blacklist
         load_instance = True
 
     id = fields.Number(dump_only=True)

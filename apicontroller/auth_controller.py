@@ -12,11 +12,11 @@ def registerUser(registeredUser):
         user = User.query.filter(
             or_(User.username == registeredUser.username, User.email == registeredUser.email)).first()
         if user:
-            return False, "Username or email already registered."
+            return False, "Username or email already registered.", "null"
         else:
             db.session.add(registeredUser)
             db.session.commit()
-            return True, "User registered successfully."
+            return True, "User registered successfully.", user_schema.dump(registeredUser)
 
     except Exception as e:
         return False, e.args

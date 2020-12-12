@@ -85,7 +85,7 @@ class UserSchema(SQLAlchemyAutoSchema):
 
     id = fields.Number(dump_only=True)
     username = fields.String(required=True, validate=validate.Length(min=3, max=40))
-    email = fields.String(required=True, help='Unique Email Required.')
+    email = fields.Email(required=True, help='Unique Email Required.')
     image_file = fields.String(required=False)
 
     posts = fields.Nested(PostSchema, many=True)
