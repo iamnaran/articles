@@ -7,6 +7,8 @@ from articles.config import Config
 from flask_moment import Moment
 from flask_marshmallow import Marshmallow
 from flask_restx import Api
+from flask_jwt_extended import JWTManager
+
 
 db = SQLAlchemy()
 ma = Marshmallow()
@@ -14,6 +16,7 @@ bcrypt = Bcrypt()
 login_manager = LoginManager()
 moment = Moment()
 api = Api()
+jwt = JWTManager()
 
 
 login_manager.login_view = 'users.login'
@@ -33,6 +36,7 @@ def create_app(conf_class=Config):
     mail.init_app(app)
     moment.init_app(app)
     api.init_app(app)
+    jwt.init_app(app)
 
     from articles.api.endpoints_v1 import endpoints
     from articles.users.routes import users

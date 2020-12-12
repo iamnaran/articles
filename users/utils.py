@@ -1,9 +1,13 @@
 import os
 import secrets
+from functools import wraps
+
 from flask_mail import Message
 from PIL import Image
-from flask import url_for, current_app
+from flask import url_for, current_app, request
 from articles import mail
+from articles.models.User import User
+from articles.models.Post import Post
 
 
 def save_picture(form_picture):
@@ -28,3 +32,26 @@ def send_reset_email(user):
 If you did not make this request then simply ignore this email and no changes will be made.
 '''
     mail.send(msg)
+
+
+def token_required(f):
+    @wraps(f)
+    def decorator(*args, **kwargs):
+
+        token = None
+
+        if 'x-access-tokens' in request.headers:
+            token = request.headers['x-access-tokens']
+
+        if not token:
+            return jsonify({'message': 'A valid token is missing'})
+
+        try:
+            data = jwt.decode(token, current_app.config['SECRET_KEY'])
+            current_user = User.query.filter_by(id=data['user_id']).first()
+        except:
+            return jsonify({'message': 'token is invalid'})
+
+        return f(current_user, *args, **kwargs)
+
+    return decorator
