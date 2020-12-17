@@ -6,11 +6,10 @@ from marshmallow import ValidationError
 from flask import jsonify
 from articles import bcrypt
 from articles.models.User import User, UserSchema, user_schema
+from articles.models.Post import PostSchema, Post
 from articles.models.Post import Post
 from articles.models import RevokedToken
-from articles.apicontroller import user_controller, post_controller, auth_controller
-
-from flask_jwt import jwt_required, current_identity
+from articles.apicontroller import user_controller, post_controller, auth_controller, comment_controller
 
 from flask_jwt_extended import (
     create_access_token,
@@ -88,7 +87,7 @@ class LoginUser(Resource):
             password = request.form['password']
             status, message, auth_token, user = auth_controller.loginUser(email, password)
 
-            return {'status': status, 'message': message, 'data': user, 'auth_token': auth_token.decode()}
+            return {'status': status, 'message': message, 'data': user, 'auth_token': auth_token}
 
         except ValidationError as err:
             return {'status': "status", 'message': err.messages}
@@ -104,18 +103,19 @@ class RegisterUser(Resource):
     def post(self):
 
         try:
+
             result = UserSchema().load(request.form)
             hash_password = bcrypt.generate_password_hash(result['password']).decode('utf-8')
 
             user = User(username=result['username'], email=result['email'], password=hash_password)
-            status, message, registered_user = auth_controller.registerUser(user)
+            status, message, registered_user, auth_token = auth_controller.registerUser(user)
 
             if status:
                 access_token = create_access_token(identity=user.id)
                 refresh_token = create_refresh_token(identity=user.id)
 
-                user_dict = {'access_token': access_token, 'refresh_token': refresh_token}
-                user_dict['user'] = registered_user
+                user_dict = {'access_token': access_token, 'refresh_token': refresh_token, 'auth_token': auth_token,
+                             'user': registered_user}
 
                 return jsonify({'status': status, 'message': message,
                                 'data': user_dict})
@@ -197,20 +197,6 @@ class UserLogoutRefresh(Resource):
             return {'status': False, 'message': 'Something went wrong'}, 500
 
 
-@ns.route("/post/create", methods=['POST'])
-@api.doc('Create Post articles')
-class Posts(Resource):
-    """Post List"""
-
-    def create(self):
-        """List all posts"""
-        data = request.get_json()
-
-        message = 'Post list fetched successfully'
-        posts = post_controller.get_all_post()
-        return {'status': True, 'message': message, 'data': posts}
-
-
 @ns.route("/jwt-test", methods=['GET'])
 @api.doc('JWT TEST')
 class SecretResource(Resource):
@@ -220,3 +206,172 @@ class SecretResource(Resource):
             'answer': 42
         }
 
+
+@jwt_required
+@ns.route("/post/create", methods=['POST'])
+@api.doc('Create Post articles')
+class Posts(Resource):
+    """Post List"""
+
+    def post(self):
+        """List all posts"""
+
+        try:
+            auth_header = request.headers.get('Authorization')
+            title = request.form['title']
+            content = request.form['content']
+            auth_token = auth_controller.check_auth_header(auth_header=auth_header)
+
+            userId = User.decode_auth_token(auth_token=auth_token)
+            if userId:
+                user = User.find_by_Id(user_id=userId)
+
+                if user:
+                    try:
+                        post = post_controller.create_new_post(title=title, content=content, user_id=user.id)
+                        if post:
+                            message = 'User posted successfully'
+                            return {'status': True, 'message': message, 'data': post}
+
+                        else:
+                            message = 'Cannot identify user id'
+                            return {'status': True, 'message': message, 'data': "cannot post"}
+
+                    except ValidationError as err:
+                        return {'status': "status", 'message': err.messages}
+
+                else:
+                    message = 'Cannot identify user id'
+                    return {'status': True, 'message': message}
+
+        except ValidationError as err:
+            return {'status': "status", 'message': err.messages}
+
+
+@jwt_required
+@ns.route("/post/comment/create", methods=['POST'])
+@api.doc('Create Comment for articles')
+class Comments(Resource):
+    """Post List"""
+
+    def post(self):
+        """List all posts"""
+
+        try:
+            auth_header = request.headers.get('Authorization')
+            comment_content = request.form['comment']
+            post_id_content = request.form['post_id']
+            auth_token = auth_controller.check_auth_header(auth_header=auth_header)
+
+            userId = User.decode_auth_token(auth_token=auth_token)
+            if userId:
+                user = User.find_by_Id(user_id=userId)
+
+                if user:
+                    try:
+                        comment = comment_controller.post_a_new_comment(comment=comment_content, user_id=user.id,
+                                                                        post_id=post_id_content)
+                        if comment:
+                            message = 'User commented successfully'
+                            return {'status': True, 'message': message, 'data': comment}
+
+                        else:
+                            message = 'Cannot identify user id'
+                            return {'status': True, 'message': message, 'data': "cannot post"}
+
+                    except ValidationError as err:
+                        return {'status': "status", 'message': err.messages}
+
+                else:
+                    message = 'Cannot identify user id'
+                    return {'status': True, 'message': message}
+
+        except ValidationError as err:
+            return {'status': "status", 'message': err.messages}
+
+
+@jwt_required
+@ns.route("/post/<int:post_id>", methods=['GET'])
+@api.doc("Get post and comment by post id ")
+class GetPostWithComments(Resource):
+
+    def get(self, post_id):
+
+        try:
+            auth_header = request.headers.get('Authorization')
+            post_id_content = post_id
+            auth_token = auth_controller.check_auth_header(auth_header=auth_header)
+
+            userId = User.decode_auth_token(auth_token=auth_token)
+
+            # return {'status': True, 'message': post_id_content, 'data': userId}
+
+            if userId:
+                user = User.find_by_Id(user_id=userId)
+                post = post_controller.get_post_by_id(post_id)
+
+                if user and post:
+                    try:
+                        comments = comment_controller.get_all_comment_by_post(post_id=post_id_content)
+                        if comments:
+                            message = 'Comments received successfully'
+
+                            response_dict = {'post': post, 'comments': comments}
+
+                            return {'status': True, 'message': message, 'data': response_dict}
+
+                        else:
+                            message = 'No Comments'
+                            return {'status': True, 'message': message, 'data': "null"}
+
+                    except ValidationError as err:
+                        return {'status': "status", 'message': err.messages}
+
+                else:
+                    message = 'Cannot identify user'
+                    return {'status': True, 'message': message}
+
+
+        except ValidationError as err:
+            return {'status': "status", 'message': err.messages}
+
+@jwt_required
+@ns.route("/post/comments/<int:post_id>", methods=['GET'])
+@api.doc("Get all comments by post id ")
+class AllComments(Resource):
+
+    def get(self, post_id):
+
+        try:
+            auth_header = request.headers.get('Authorization')
+            post_id_content = post_id
+            auth_token = auth_controller.check_auth_header(auth_header=auth_header)
+
+            userId = User.decode_auth_token(auth_token=auth_token)
+
+            # return {'status': True, 'message': post_id_content, 'data': userId}
+
+            if userId:
+                user = User.find_by_Id(user_id=userId)
+
+                if user:
+                    try:
+                        comments = comment_controller.get_all_comment_by_post(post_id=post_id_content)
+                        if comments:
+                            message = 'Comments received successfully'
+                            return {'status': True, 'message': message, 'data': comments}
+
+                        else:
+                            message = 'No Comments'
+                            return {'status': True, 'message': message, 'data': "null"}
+
+                    except ValidationError as err:
+                        return {'status': "status", 'message': err.messages}
+
+                else:
+                    message = 'Cannot identify user'
+                    return {'status': True, 'message': message}
+
+
+        except ValidationError as err:
+            return {'status': "status", 'message': err.messages}

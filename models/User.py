@@ -1,10 +1,9 @@
 import datetime
 
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from articles import db, login_manager
+from articles import db, login_manager, ma
 from flask_login import UserMixin
 from flask import current_app
-from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from marshmallow import fields, validate
 import jwt
 
@@ -19,12 +18,13 @@ def load_user(user_id):
 class User(db.Model, UserMixin):
     __tablename__ = 'user'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     image_file = db.Column(db.String(20), nullable=False, default='default.png')
     password = db.Column(db.String(60), nullable=False)
     post = db.relationship('Post', backref='author', lazy=True)
+    comments = db.relationship('Comment', backref='commented_by', lazy=True)
 
     def __init__(self, username, email, password):
         self.username = username
@@ -54,7 +54,7 @@ class User(db.Model, UserMixin):
         """
         try:
             payload = {
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=5),
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=5, seconds=5),
                 'iat': datetime.datetime.utcnow(),
                 'sub': user_id
             }
@@ -66,6 +66,22 @@ class User(db.Model, UserMixin):
         except Exception as e:
             return e
 
+    @staticmethod
+    def decode_auth_token(auth_token):
+        """
+        Decodes the auth token
+        :param auth_token:
+        :return: integer|string
+
+        """
+        try:
+            payload = jwt.decode(auth_token, current_app.config.get('SECRET_KEY'))
+            return payload['sub']
+        except jwt.ExpiredSignatureError:
+            return 'Signature expired. Please log in again.'
+        except jwt.InvalidTokenError:
+            return 'Invalid token. Please log in again.'
+
     def save_to_db(self):
 
         db.session.add(self)
@@ -75,19 +91,23 @@ class User(db.Model, UserMixin):
     @classmethod
     def find_by_username(cls, username):
 
-        return cls.query.filter_by(username=username).first()
+        return User.query.filter_by(username=username).first()
+
+    @classmethod
+    def find_by_Id(cls, user_id):
+
+        return User.query.filter_by(id=user_id).first()
 
 
-class UserSchema(SQLAlchemyAutoSchema):
+class UserSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         # Fields to expose
         model = User
 
-    id = fields.Number(dump_only=True)
+    id = fields.Integer(dump_only=True)
     username = fields.String(required=True, validate=validate.Length(min=3, max=40))
     email = fields.Email(required=True, help='Unique Email Required.')
     image_file = fields.String(required=False)
-
     posts = fields.Nested(PostSchema, many=True)
 
 

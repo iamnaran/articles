@@ -1,6 +1,7 @@
 from datetime import datetime
-from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-from marshmallow import fields
+from articles import ma
+from marshmallow import fields, validate
+from articles.models.Comment import CommentSchema
 
 from articles import db
 
@@ -13,22 +14,26 @@ class Post(db.Model):
     date_poasted = db.Column(db.DateTime, default=datetime.utcnow)
     content = db.Column(db.Text, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    comments = db.relationship('Comment', backref='comments', lazy=True)
 
     def __repr__(self):
-        return f"User('{self.title}','{self.content}','{self.date_posted}')"
+        return f"User('{self.title}','{self.content}','{self.date_poasted}')"
 
 
-class PostSchema(SQLAlchemyAutoSchema):
+class PostSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         # Fields to expose
         model = Post
         include_relationships = True
         load_instance = True
 
-    id = fields.Number(dump_only=True)
-    title = fields.String(required=True)
-    date_poasted = fields.DateTime(required=True)
-    user_id = fields.Integer()
+    id = fields.Integer(dump_only=True)
+    title = fields.String(required=True, help='Title Required.')
+    content = fields.String(required=True, help='Content Required.')
+    date_poasted = fields.DateTime(dump_only=True)
+    # user_id = fields.Integer()
+    author = fields.Nested("UserSchema", only=("id", "username", "email"))
+    comments = fields.Nested(CommentSchema, many=True)
 
 
 post_schema = PostSchema()

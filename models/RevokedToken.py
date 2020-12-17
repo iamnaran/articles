@@ -1,6 +1,6 @@
 from datetime import datetime
-from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-from marshmallow import fields
+from articles import ma
+from marshmallow import fields, validate
 
 from articles.models.User import User
 
@@ -27,7 +27,7 @@ class Blacklist(db.Model):
         return '<id: token: {}'.format(self.jti)
 
 
-class TokenSchema(SQLAlchemyAutoSchema):
+class TokenSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         # Fields to expose
         model = Blacklist
