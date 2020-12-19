@@ -7,17 +7,20 @@ from sqlalchemy import or_, and_
 from articles import db, bcrypt
 
 
-def registerUser(registeredUser):
+def registerUser(username, email, hash_password):
+
+    new_user = User(username=username, email=email, password=hash_password)
     try:
         user = User.query.filter(
-            or_(User.username == registeredUser.username, User.email == registeredUser.email)).first()
+            or_(User.username == new_user.username, User.email == new_user.email)).first()
         if user:
             return False, "Username or email already registered.", "null", "null"
         else:
-            db.session.add(registeredUser)
+            db.session.add(new_user)
             db.session.commit()
-            auth_token = User.encode_auth_token(user.id)
-            return True, "User registered successfully.", user_schema.dump(registeredUser), auth_token
+            auth_token = User.encode_auth_token(new_user.id)
+
+            return True, "User registered successfully.", user_schema.dump(new_user), auth_token.decode()
 
     except Exception as e:
         return False, e.args, "null", "null"
@@ -45,11 +48,10 @@ def check_auth_header(auth_header):
     else:
         return ''
 
-
 # def check_is_jwt_valid(auth_header):
 
-    # if  decode_and_verify_jwt(auth_header, is_access_token=True, check_csrf=False):
-    #
-    #     return True
-    # else:
-    #     return False
+# if  decode_and_verify_jwt(auth_header, is_access_token=True, check_csrf=False):
+#
+#     return True
+# else:
+#     return False

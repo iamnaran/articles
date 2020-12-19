@@ -8,6 +8,7 @@ from marshmallow import fields, validate
 import jwt
 
 from articles.models.Post import PostSchema
+from articles.models.PostLike import PostLikeSchema
 
 
 @login_manager.user_loader
@@ -25,6 +26,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(60), nullable=False)
     post = db.relationship('Post', backref='author', lazy=True)
     comments = db.relationship('Comment', backref='commented_by', lazy=True)
+    likes = db.relationship('PostLike', backref='liked_by', lazy=True)
 
     def __init__(self, username, email, password):
         self.username = username
@@ -47,6 +49,7 @@ class User(db.Model, UserMixin):
     def __repr__(self):
         return f"User('{self.username}','{self.email}','{self.image_file}')"
 
+    @staticmethod
     def encode_auth_token(user_id):
         """
         Generates the Auth Token
@@ -111,5 +114,5 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
     posts = fields.Nested(PostSchema, many=True)
 
 
-user_schema = UserSchema(only=("username", "email", "image_file"))
+user_schema = UserSchema()
 users_schema = UserSchema(many=True)

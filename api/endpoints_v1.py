@@ -105,15 +105,21 @@ class RegisterUser(Resource):
         try:
 
             result = UserSchema().load(request.form)
+
+            username = result['username']
+            email = result['email']
             hash_password = bcrypt.generate_password_hash(result['password']).decode('utf-8')
 
-            user = User(username=result['username'], email=result['email'], password=hash_password)
-            status, message, registered_user, auth_token = auth_controller.registerUser(user)
+            status, message, registered_user, auth_token = auth_controller.registerUser(username, email, hash_password)
 
-            if status:
-                access_token = create_access_token(identity=user.id)
-                refresh_token = create_refresh_token(identity=user.id)
+            if status and registered_user:
 
+                user_id = registered_user['id']
+                access_token = create_access_token(identity=user_id)
+                refresh_token = create_refresh_token(identity=user_id)
+
+                # user_dict = {'access_token': access_token, 'refresh_token': refresh_token, 'auth_token': auth_token,
+                #              'user': registered_user}
                 user_dict = {'access_token': access_token, 'refresh_token': refresh_token, 'auth_token': auth_token,
                              'user': registered_user}
 
@@ -121,8 +127,6 @@ class RegisterUser(Resource):
                                 'data': user_dict})
             else:
                 return jsonify({'status': status, 'message': message})
-
-            # return {'status': status, 'message': message, 'has_password': hash_password, 'username': result['username']}
 
         except ValidationError as err:
             return {'status': "status", 'message': err.messages}
@@ -221,7 +225,6 @@ class Posts(Resource):
             title = request.form['title']
             content = request.form['content']
             auth_token = auth_controller.check_auth_header(auth_header=auth_header)
-
             userId = User.decode_auth_token(auth_token=auth_token)
             if userId:
                 user = User.find_by_Id(user_id=userId)
@@ -335,11 +338,11 @@ class GetPostWithComments(Resource):
         except ValidationError as err:
             return {'status': "status", 'message': err.messages}
 
+
 @jwt_required
 @ns.route("/post/comments/<int:post_id>", methods=['GET'])
 @api.doc("Get all comments by post id ")
 class AllComments(Resource):
-
     def get(self, post_id):
 
         try:
@@ -363,6 +366,48 @@ class AllComments(Resource):
 
                         else:
                             message = 'No Comments'
+                            return {'status': True, 'message': message, 'data': "null"}
+
+                    except ValidationError as err:
+                        return {'status': "status", 'message': err.messages}
+
+                else:
+                    message = 'Cannot identify user'
+                    return {'status': True, 'message': message}
+
+
+        except ValidationError as err:
+            return {'status': "status", 'message': err.messages}
+
+
+@jwt_required
+@ns.route("/post/like/<int:post_id>", methods=['POST'])
+@api.doc("Like a post , 0=Liked , 1= Unliked ")
+class PostLike(Resource):
+
+    def post(self, post_id):
+
+        try:
+            auth_header = request.headers.get('Authorization')
+            post_id_content = post_id
+            auth_token = auth_controller.check_auth_header(auth_header=auth_header)
+
+            userId = User.decode_auth_token(auth_token=auth_token)
+
+
+            if userId:
+                user = user_controller.get_user_by_id(userId)
+
+                if user:
+                    try:
+                        post_like = post_controller.post_a_like(post_id=post_id_content,
+                                                                user_id=user['id'])
+                        if post_like:
+                            message = 'Post liked successfully'
+                            return {'status': True, 'message': message, 'data': post_like}
+
+                        else:
+                            message = 'No Fuck Given'
                             return {'status': True, 'message': message, 'data': "null"}
 
                     except ValidationError as err:
