@@ -7,6 +7,8 @@ from articles import db
 from articles.models.PostLike import PostLikeSchema
 
 
+
+
 class Post(db.Model):
     __tablename__ = 'post'
 
