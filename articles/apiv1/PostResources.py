@@ -17,6 +17,7 @@ post_apis = Namespace('post_apis', description='Post related operations')
 
 
 @post_apis.route('/post')
+@post_apis.doc('Get all post & Create New Post')
 class PostResources(Resource):
     """Post Create & List"""
 

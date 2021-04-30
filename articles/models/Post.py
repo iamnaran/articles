@@ -25,7 +25,7 @@ class Post(db.Model):
         return Post.query.all()
 
     @staticmethod
-    def get_post_by_id(self, post_id):
+    def get_post_by_id(post_id):
         post = Post.query.get(post_id)
         return post_schema.dump(post)
 
