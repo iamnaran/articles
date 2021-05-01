@@ -35,7 +35,7 @@ class PostOperationResource(Resource):
                     message = 'Cannot Post due to some error. Please try again later..'
                     return {'status': False, 'message': message, 'data': "null"}
             except Exception as err:
-                message = 'Error has occurred while updating'
+                message = 'Error has occurred while updatinga'
                 return {'status': False, 'message': message + str(err.args), 'data': "null"}
 
         except Exception as err:
