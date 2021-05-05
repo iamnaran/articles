@@ -1,3 +1,5 @@
+import datetime
+
 from flask import request
 from flask_restx import Resource, Namespace
 from article import db, bcrypt
@@ -33,7 +35,7 @@ class LoginResource(Resource):
 
                 if user:
                     if bcrypt.check_password_hash(user.password, password):
-                        auth_token = create_access_token(identity=user.id)
+                        auth_token = create_access_token(identity=user.id, expires_delta=datetime.timedelta(weeks=4))
                         refresh_token = create_refresh_token(identity=user.id)
                         message = 'Logged In Successfully'
                         return {'status': True, 'message': message, 'data': user_schema.dump(user),

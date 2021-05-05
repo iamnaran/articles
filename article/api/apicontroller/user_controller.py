@@ -37,7 +37,7 @@ def unfollow_user(user_id, userToFollowId):
     userToFollow = User.find_by_Id(userToFollowId)
     print("called current user ", user)
     print("called user to unfollow ", userToFollow)
-    user.unfollow(user, userToFollow)
+    user.un_follow(user, userToFollow)
     db.session.commit()
     return user_schema.dump(userToFollow)
 

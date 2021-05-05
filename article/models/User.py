@@ -36,7 +36,6 @@ class User(db.Model, UserMixin):
     post = db.relationship('Post', backref='author', lazy=True)
     comments = db.relationship('Comment', backref='commented_by', lazy=True)
     likes = db.relationship('PostLike', backref='liked_by', lazy=True)
-    roles = db.relationship('Role', secondary='user_roles', backref='user_role')
     followed = db.relationship('User',
                                secondary=followers,
                                primaryjoin=(followers.c.follower_id == id),
@@ -72,16 +71,12 @@ class User(db.Model, UserMixin):
     def __repr__(self):
         return f"User('{self.username}','{self.email}','{self.image_file}')"
 
-
-
     @staticmethod
     def encode_auth_token(user_id):
         """
         Generates the Auth Token
         :return: string
         """
-
-
         try:
             payload = {
                 'exp': datetime.now() + timedelta(days=10, seconds=5),
@@ -141,7 +136,7 @@ class User(db.Model, UserMixin):
             user.followed.append(userToFollow)
 
     @classmethod
-    def unfollow(self, user, userToFollow):
+    def un_follow(self, user, userToFollow):
         if user.is_following(user, userToFollow):
             user.followed.remove(userToFollow)
 
@@ -150,12 +145,12 @@ class User(db.Model, UserMixin):
         return user.followed.filter(
             followers.c.followed_id == userToFollow.id).count() > 0
 
-    @classmethod
-    def followed_posts(self):
-        return Post.query.join(
-            followers, (followers.c.followed_id == Post.user_id)).filter(
-            followers.c.follower_id == self.id).order_by(
-            Post.date_poasted.desc())
+    # @classmethod
+    # def followed_posts(self):
+    #     return Post.query.join(
+    #         followers, (followers.c.followed_id == Post.user_id)).filter(
+    #         followers.c.follower_id == self.id).order_by(
+    #         Post.date_poasted.desc())
 
 
 class UserSchema(ma.SQLAlchemyAutoSchema):
@@ -169,8 +164,7 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
     email = fields.Email(required=True, help='Unique Email Required.')
     image_file = fields.String(required=False)
     posts = fields.Nested(PostSchema, many=True)
-    role = fields.Nested(RoleSchema)
 
 
-user_schema = UserSchema()
-users_schema = UserSchema(many=True)
+user_schema = UserSchema(only=("id", "username", "email", "image_file", "user_type"))
+users_schema = UserSchema(only=("id", "username", "email", "image_file", "user_type"), many=True)
