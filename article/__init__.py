@@ -6,7 +6,6 @@ from flask_mail import Mail
 from flask_moment import Moment
 from flask_marshmallow import Marshmallow
 from flask_jwt_extended import JWTManager
-from flask_dropzone import Dropzone
 
 from article.config import Config
 
@@ -17,7 +16,6 @@ login_manager = LoginManager()
 moment = Moment()
 jwt = JWTManager()
 mail = Mail()
-dropzone = Dropzone()
 
 login_manager.login_view = 'users.login'
 login_manager.login_message_category = 'info'
@@ -36,7 +34,6 @@ def create_app(conf_class=Config):
     mail.init_app(app)
     moment.init_app(app)
     jwt.init_app(app)
-    dropzone.init_app(app)
 
     from article.users.routes import users
     from article.main.routes import main
