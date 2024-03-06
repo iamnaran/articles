@@ -3,8 +3,9 @@ import secrets
 from functools import wraps
 
 from flask_mail import Message
-from PIL import Image
-from flask import url_for, current_app, request
+# from PIL import Image
+from flask import jsonify, url_for, current_app, request
+import jwt
 from article import mail
 from article.models.User import User
 
@@ -15,9 +16,9 @@ def save_picture(form_picture):
     picture_filename = random_hex + f_ext
     picture_path = os.path.join(current_app.root_path, 'static/profile_pics', picture_filename)
     output_size = (125, 125)
-    i = Image.open(form_picture)
-    i.thumbnail(output_size)
-    i.save(picture_path)
+    # i = Image.open(form_picture)
+    # i.thumbnail(output_size)
+    # i.save(picture_path)
     return picture_filename
 
 
