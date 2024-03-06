@@ -3,13 +3,12 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_mail import Mail
-
-from article.config import Config
 from flask_moment import Moment
 from flask_marshmallow import Marshmallow
 from flask_jwt_extended import JWTManager
 from flask_dropzone import Dropzone
 
+from article.config import Config
 
 db = SQLAlchemy()
 ma = Marshmallow()
@@ -19,7 +18,6 @@ moment = Moment()
 jwt = JWTManager()
 mail = Mail()
 dropzone = Dropzone()
-
 
 login_manager.login_view = 'users.login'
 login_manager.login_message_category = 'info'
@@ -54,7 +52,13 @@ def create_app(conf_class=Config):
     app.register_blueprint(errors)
 
     # API
-
     app.register_blueprint(api_v1)
 
     return app
+
+# Create the Flask application instance
+app = create_app()
+
+if __name__ == '__main__':
+    # Run the Flask application
+    app.run(debug=True)
