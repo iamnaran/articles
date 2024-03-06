@@ -24,9 +24,9 @@ def create_app(conf_class=Config):
     app = Flask(__name__)
     app.config.from_object(Config)
     db.init_app(app)
-    with app.app_context():
-        print("* Head's up! A Database has been create with this project called " + current_app.name)
-        db.create_all()
+    # with app.app_context():
+    #     print("* Head's up! A Database has been create with this project called " + current_app.name)
+    #     db.create_all()
 
     ma.init_app(app)
     bcrypt.init_app(app)
