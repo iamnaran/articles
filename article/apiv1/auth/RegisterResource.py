@@ -29,8 +29,12 @@ class RegisterResource(Resource):
             response = UserSchema().load(request.form)
             username = response['username']
             email = response['email']
+            idToken = request.form['idToken']
+            userFrom = request.form['userFrom']
+
+
             hash_password = bcrypt.generate_password_hash(response['password']).decode('utf-8')
-            new_user = User(username=username, email=email, password=hash_password)
+            new_user = User(username=username, email=email, password=hash_password,userFrom=userFrom, idToken=idToken)
             try:
                 user = User.query.filter(
                     or_(User.username == new_user.username, User.email == new_user.email)).first()

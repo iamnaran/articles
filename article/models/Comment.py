@@ -21,6 +21,23 @@ class Comment(db.Model):
 
     def __repr__(self):
         return f"User('{self.comment}','{self.commented_date}','{self.user_id}','{self.post_id}')"
+    
+    def __repr__(self):
+         return f"User('{self.title}','{self.content}','{self.date_poasted}')"
+
+    @staticmethod
+    def getAllComment():
+        return Comment.query.all()
+
+    @staticmethod
+    def getAllCommentsByPostId(postId):
+        comments = Comment.query.filter_by(post_id=postId).all()
+        return commentsSchema.dump(comments)
+    
+    @staticmethod
+    def getCommentById(commnetId):
+        comment = Comment.query.filter_by(commnetId=commnetId).all()
+        return commentSchema.dump(comment)
 
 
 class CommentSchema(ma.SQLAlchemyAutoSchema):

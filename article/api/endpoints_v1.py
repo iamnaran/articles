@@ -69,7 +69,7 @@ class postDetails(Resource):
     def delete(self):
         message = 'Post deleted successfully'
         post_controller.get_all_post()
-        return {'status': True, 'message': message, 'data': post}
+        return {'status': True, 'message': message}
 
 
 @ns.route("/login")
@@ -247,10 +247,10 @@ class Posts(Resource):
 @ns.route("/post/comment/create", methods=['POST'])
 @api.doc('Create Comment for article')
 class Comments(Resource):
-    """Post List"""
+    """Comment List"""
 
     def post(self):
-        """List all posts"""
+        """Post a comment"""
 
         try:
             auth_header = request.headers.get('Authorization')

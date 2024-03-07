@@ -30,6 +30,8 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_type = db.Column(db.Integer, nullable=False, server_default='0')
     username = db.Column(db.String(20), unique=True, nullable=False)
+    idToken = db.Column(db.String(120), unique=True, nullable=False)
+    userFrom = db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     image_file = db.Column(db.String(20), nullable=False, default='default.png')
     password = db.Column(db.String(60), nullable=False)
@@ -50,9 +52,11 @@ class User(db.Model, UserMixin):
     #                                  backref=db.backref('followers', lazy='dynamic'),
     #                                  lazy='dynamic')
 
-    def __init__(self, username, email, password):
+    def __init__(self, username, idToken,userFrom, email, password):
         self.username = username
+        self.idToken = idToken
         self.email = email
+        self.userFrom = userFrom
         self.password = password
 
     def get_reset_token(self, expires_sec=1800):
@@ -160,11 +164,13 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
 
     id = fields.Integer(dump_only=True)
     user_type = fields.Integer(dump_only=True)
+    idToken = fields.String(required=True)
+    userFrom = fields.String(required=True)
     username = fields.String(required=True, validate=validate.Length(min=3, max=40))
     email = fields.Email(required=True, help='Unique Email Required.')
     image_file = fields.String(required=False)
     posts = fields.Nested(PostSchema, many=True)
 
 
-user_schema = UserSchema(only=("id", "username", "email", "image_file", "user_type"))
-users_schema = UserSchema(only=("id", "username", "email", "image_file", "user_type"), many=True)
+user_schema = UserSchema(only=("id", "username", "email", "image_file", "user_type", "idToken"))
+users_schema = UserSchema(only=("id", "username", "email", "image_file", "user_type", "idToken"), many=True)

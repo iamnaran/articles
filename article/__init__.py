@@ -6,6 +6,9 @@ from flask_mail import Mail
 from flask_moment import Moment
 from flask_marshmallow import Marshmallow
 from flask_jwt_extended import JWTManager
+from flask_migrate import Migrate, upgrade
+import os
+
 
 from article.config import Config
 
@@ -20,13 +23,18 @@ mail = Mail()
 login_manager.login_view = 'users.login'
 login_manager.login_message_category = 'info'
 
+
 def create_app(conf_class=Config):
     app = Flask(__name__)
     app.config.from_object(Config)
     db.init_app(app)
-    # with app.app_context():
-    #     print("* Head's up! A Database has been create with this project called " + current_app.name)
-    #     db.create_all()
+    migrate = Migrate(app, db)
+
+    with app.app_context():
+            print("---> Table Created")
+            db.create_all()
+            migrate.init_app(app, db)
+            upgrade()
 
     ma.init_app(app)
     bcrypt.init_app(app)
@@ -59,3 +67,5 @@ app = create_app()
 if __name__ == '__main__':
     # Run the Flask application
     app.run(debug=True)
+
+

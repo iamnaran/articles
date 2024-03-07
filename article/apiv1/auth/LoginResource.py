@@ -30,6 +30,7 @@ class LoginResource(Resource):
         try:
             email = request.form['email']
             password = request.form['password']
+
             try:
                 user = User.find_by_email(email=email)
 
