@@ -10,6 +10,8 @@ from article.apiv1.StoryResources import stories_apis
 from article.apiv1.post.CommentResources import comment_apis
 from article.apiv1.post.CommentOpResources import comment_operation_apis
 from article.apiv1.post.LikeResources import likeapis
+from article.apiv1.home.HomeResource import homePageApis
+
 
 
 
@@ -34,5 +36,9 @@ api.add_namespace(likeapis, path='/likes')
 
 api.add_namespace(auth_apis, path='/auth')
 api.add_namespace(auth_register_apis, path='/auth')
+
+api.add_namespace(homePageApis, path='/home')
+
+
 
 api.add_namespace(stories_apis, path='/stories')

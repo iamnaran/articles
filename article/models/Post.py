@@ -23,6 +23,11 @@ class Post(db.Model):
     @staticmethod
     def get_all_post():
         return Post.query.all()
+    
+    @staticmethod
+    def getAllPostForHomePage():
+        posts = Post.query.all()
+        return posts_schema.dump(posts)
 
     @staticmethod
     def get_post_by_id(post_id):

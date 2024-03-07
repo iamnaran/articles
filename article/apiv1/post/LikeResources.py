@@ -26,25 +26,30 @@ class LikeResources(Resource):
     
     @jwt_required()
     def post(self, post_id):
-        current_user_id = get_jwt_identity()
-        
-        # Check if the user has already liked the post
-        existing_like = PostLike.getExistingClap(postId=post_id, userId= current_user_id)
+        try:
 
-        if existing_like:
-            clap_limit = 50
-            user_claps_count = existing_like.clap_count
-            if user_claps_count >= clap_limit:
-                return {'status': False, 'message': 'You have reached the limit of claps for this post'}, 400
-             # Increment the clap count
-            existing_like.clap_count += 1
+            current_user_id = get_jwt_identity()
+            
+            # Check if the user has already liked the post
+            existing_like = PostLike.getExistingClap(postId=post_id, userId= current_user_id)
+
+            if existing_like:
+                clap_limit = 50
+                user_claps_count = existing_like.clap_count
+                if user_claps_count >= clap_limit:
+                    return {'status': False, 'message': 'You have reached the limit of claps for this post'}, 400
+                # Increment the clap count
+                existing_like.clap_count += 1
+                db.session.commit()
+                return {'status': True, 'message': 'You have clapped again for this post'}, 200
+            
+            
+            # Add a new clap
+            like = PostLike(user_id=current_user_id, post_id=post_id, clap_count=1)
+            db.session.add(like)
             db.session.commit()
-            return {'status': True, 'message': 'You have clapped again for this post'}, 200
-        
-        
-        # Add a new clap
-        like = PostLike(user_id=current_user_id, post_id=post_id, clap_count=1)
-        db.session.add(like)
-        db.session.commit()
-        
-        return {'status': True, 'message': 'Post clapped successfully'}, 200
+            
+            return {'status': True, 'message': 'Post clapped successfully'}, 200
+        except:
+            return {'status': False, 'message': 'Error in clapping'}, 400
+

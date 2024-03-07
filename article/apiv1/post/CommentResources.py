@@ -24,10 +24,13 @@ class CommentResource(Resource):
     @jwt_required()
     def get(self, post_id):
         """Get a post with id"""
-
-        post = Comment.getAllCommentsByPostId(post_id)
-        message = 'Comments fetched successfully'
-        return {'status': True, 'message': message, 'data': post}
+        try:
+            post = Comment.getAllCommentsByPostId(post_id)
+            message = 'Comments fetched successfully'
+            return {'status': True, 'message': message, 'data': post}
+        except:
+            message = 'Error has occurred while requesting post'
+            return {'status': False, 'message': message, 'data': "null"}
 
 
     def post(self, post_id):
