@@ -11,8 +11,8 @@ from flask_jwt_extended import (
     get_jwt
 )
 
-from article.models.Post import post_schema, Post, posts_schema
-from article.models.PostLike import post_like_schema, PostLike, post_likes_schema
+from article.models.post.Post import post_schema, Post, posts_schema
+from article.models.post.PostLike import post_like_schema, PostLike, post_likes_schema
 
 
 

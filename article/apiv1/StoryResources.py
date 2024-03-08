@@ -15,8 +15,8 @@ from flask_jwt_extended import (
     get_jwt
 )
 
-from article.models.StoryFile import StoryFile, story_file_Schema, story_files_schema
-from article.models.Story import Story, story_schema, stories_schema
+from article.models.story.StoryFile import StoryFile, story_file_Schema, story_files_schema
+from article.models.story.Story import Story, story_schema, stories_schema
 
 stories_apis = Namespace('stories_apis', description='Story related operations')
 

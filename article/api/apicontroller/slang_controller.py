@@ -2,9 +2,9 @@ from flask import jsonify
 from sqlalchemy import or_, and_
 
 from article import db
-from article.models.SlangWord import SlangWord
-from article.models.SlangWord import slang_word_schema, slang_words_schema
-from article.models.SlangWordUpVote import SlangWordUpVote, slang_upvote_schema
+from article.models.slang.SlangWord import SlangWord
+from article.models.slang.SlangWord import slang_word_schema, slang_words_schema
+from article.models.slang.SlangWordUpVote import SlangWordUpVote, slang_upvote_schema
 
 
 def get_all_slang():

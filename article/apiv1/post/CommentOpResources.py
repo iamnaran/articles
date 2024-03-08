@@ -11,7 +11,7 @@ from flask_jwt_extended import (
     get_jwt
 )
 
-from article.models.Comment import commentSchema, Comment, commentsSchema
+from article.models.post.Comment import commentSchema, Comment, commentsSchema
 
 comment_operation_apis = Namespace('comment_operation_apis', description='Comment related operations')
 

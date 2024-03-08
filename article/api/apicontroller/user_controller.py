@@ -1,6 +1,6 @@
 from article import db
-from article.models.User import User
-from article.models.User import users_schema, user_schema, UserSchema
+from article.models.user.User import User
+from article.models.user.User import users_schema, user_schema, UserSchema
 
 
 def get_all_users():

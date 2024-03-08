@@ -14,7 +14,7 @@ from flask_jwt_extended import (
     get_jwt
 )
 
-from article.models.Post import post_schema, Post, posts_schema
+from article.models.post.Post import post_schema, Post, posts_schema
 
 homePageApis = Namespace('home_apis', description='Home Page Api')
 

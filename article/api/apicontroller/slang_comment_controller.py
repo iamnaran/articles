@@ -1,6 +1,6 @@
 from article import db
-from article.models.SlangComment import SlangComment
-from article.models.SlangComment import commentSchema, commentsSchema
+from article.models.slang.SlangComment import SlangComment
+from article.models.slang.SlangComment import commentSchema, commentsSchema
 
 
 def get_all_comment_by_slang(word_id):

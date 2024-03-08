@@ -2,7 +2,7 @@ from datetime import datetime
 from article import ma
 from marshmallow import fields, validate
 
-from article.models.User import User
+from article.models.user.User import User
 
 from article import db
 

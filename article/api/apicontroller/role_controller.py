@@ -1,6 +1,6 @@
 from article import db
-from article.models.Role import Role
-from article.models.Role import role_schema
+from article.models.user.Role import Role
+from article.models.user.Role import role_schema
 
 
 def get_all_roles():

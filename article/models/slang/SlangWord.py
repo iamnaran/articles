@@ -1,12 +1,12 @@
 from datetime import datetime
 from article import ma
 from marshmallow import fields, validate
-from article.models.Comment import CommentSchema
+from article.models.post.Comment import CommentSchema
 
 from article import db
-from article.models.PostLike import PostLikeSchema
-from article.models.SlangComment import SlangCommentSchema
-from article.models.SlangWordUpVote import SlangWordUpVoteSchema
+from article.models.post.PostLike import PostLikeSchema
+from article.models.slang.SlangComment import SlangCommentSchema
+from article.models.slang.SlangWordUpVote import SlangWordUpVoteSchema
 
 
 class SlangWord(db.Model):

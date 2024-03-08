@@ -5,8 +5,8 @@ from flask_restx import Api, Resource
 from marshmallow import ValidationError
 from flask import jsonify
 from article import bcrypt
-from article.models.User import User, UserSchema
-from article.models import RevokedToken
+from article.models.user.User import User, UserSchema
+from article.models.user import RevokedToken
 from article.api.apicontroller import user_controller, role_controller, slang_comment_controller, post_controller
 from article.api.apicontroller import comment_controller, auth_controller, slang_controller
 

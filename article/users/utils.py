@@ -7,7 +7,7 @@ from flask_mail import Message
 from flask import jsonify, url_for, current_app, request
 import jwt
 from article import mail
-from article.models.User import User
+from article.models.user.User import User
 
 
 def save_picture(form_picture):

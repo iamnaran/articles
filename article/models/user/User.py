@@ -6,22 +6,17 @@ from flask import current_app
 from marshmallow import fields, validate
 import jwt
 
-from article.models import Post
-from article.models.Post import PostSchema
-from article.models.UserRoles import UserRoleSchema
-from article.models.Role import RoleSchema
+from article.models.post import Post
+from article.models.user import Follow
+
+from article.models.post.Post import PostSchema
+from article.models.user.UserRoles import UserRoleSchema
+from article.models.user.Role import RoleSchema
 
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
-
-
-followers = db.Table('followers',
-                     db.Column('follower_id', db.Integer, db.ForeignKey('user.id')),
-                     db.Column('followed_id', db.Integer, db.ForeignKey('user.id')),
-                     db.Column('timestamp', db.String, default=datetime.utcnow)
-                     )
 
 
 class User(db.Model, UserMixin):
@@ -38,12 +33,9 @@ class User(db.Model, UserMixin):
     post = db.relationship('Post', backref='author', lazy=True)
     comments = db.relationship('Comment', backref='commented_by', lazy=True)
     likes = db.relationship('PostLike', backref='liked_by', lazy=True)
-    followed = db.relationship('User',
-                               secondary=followers,
-                               primaryjoin=(followers.c.follower_id == id),
-                               secondaryjoin=(followers.c.followed_id == id),
-                               backref=db.backref('followers', lazy='dynamic'),
-                               lazy='dynamic')
+    followers = db.relationship('Follow', foreign_keys='Follow.followed_id', backref='followed_user', lazy='dynamic')
+    followed = db.relationship('Follow', foreign_keys='Follow.follower_id', backref='follower_user', lazy='dynamic')
+
 
     # user_followers = db.relationship('User',
     #                                  secondary=followers,
@@ -58,6 +50,11 @@ class User(db.Model, UserMixin):
         self.email = email
         self.userFrom = userFrom
         self.password = password
+
+    @staticmethod
+    def getUserById(userId):
+        user = User.query.filter_by(id=userId).first()
+        return user_schema.dump(user)
 
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(current_app.config['SECRET_KEY'], expires_sec)
@@ -127,34 +124,34 @@ class User(db.Model, UserMixin):
     def find_by_Id(cls, user_id):
         return User.query.filter_by(id=user_id).first()
 
-    @classmethod
-    def is_followed_by(self, user):
-        if user.id is None:
-            return False
-        return self.followers.filter_by(
-            follower_id=user.id).first() is not None
+    @staticmethod
+    def follow_user(self, user_id):
+        """Follow another user."""
+        if self.id == user_id:
+            return False, 'You cannot follow yourself'
 
-    @classmethod
-    def follow(self, user, userToFollow):
-        if not user.is_following(user, userToFollow):
-            user.followed.append(userToFollow)
+        if self.is_following(user_id):
+            return False, 'You are already following this user'
 
-    @classmethod
-    def un_follow(self, user, userToFollow):
-        if user.is_following(user, userToFollow):
-            user.followed.remove(userToFollow)
+        follow = Follow(follower_id=self.id, followed_id=user_id)
+        db.session.add(follow)
+        db.session.commit()
+        return True, 'You are now following this user'
 
-    @classmethod
-    def is_following(self, user, userToFollow):
-        return user.followed.filter(
-            followers.c.followed_id == userToFollow.id).count() > 0
+    def unfollow_user(self, user_id):
+        """Unfollow another user."""
+        follow = Follow.query.filter_by(follower_id=self.id, followed_id=user_id).first()
+        if not follow:
+            return False, 'You are not following this user'
 
-    # @classmethod
-    # def followed_posts(self):
-    #     return Post.query.join(
-    #         followers, (followers.c.followed_id == Post.user_id)).filter(
-    #         followers.c.follower_id == self.id).order_by(
-    #         Post.date_poasted.desc())
+        db.session.delete(follow)
+        db.session.commit()
+        return True, 'You have unfollowed this user'
+
+    def is_following(self, user_id):
+        """Check if the user is already following another user."""
+        return Follow.query.filter_by(follower_id=self.id, followed_id=user_id).first() is not None
+
 
 
 class UserSchema(ma.SQLAlchemyAutoSchema):

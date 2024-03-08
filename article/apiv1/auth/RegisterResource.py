@@ -13,8 +13,8 @@ from flask_jwt_extended import (
     get_jwt
 )
 
-from article.models.Role import Role
-from article.models.User import user_schema, User, UserSchema
+from article.models.user.Role import Role
+from article.models.user.User import user_schema, User, UserSchema
 
 auth_register_apis = Namespace('auth_register_apis', description='Auth related operations')
 

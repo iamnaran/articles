@@ -1,9 +1,9 @@
 import datetime
 from article import ma
 from marshmallow import fields, validate
-from article.models.StoryComment import StoryComment, StoryCommentSchema
-from article.models.StoryFile import StoryFileSchema
-from article.models.StoryVote import StoryVote, StoryVoteSchema
+from article.models.story.StoryComment import StoryComment, StoryCommentSchema
+from article.models.story.StoryFile import StoryFileSchema
+from article.models.story.StoryVote import StoryVote, StoryVoteSchema
 
 from article import db
 

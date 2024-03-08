@@ -1,7 +1,7 @@
 from article import db
-from article.models.Post import Post
-from article.models.Post import posts_schema, post_schema
-from article.models.PostLike import PostLike, post_like_schema
+from article.models.post.Post import Post
+from article.models.post.Post import posts_schema, post_schema
+from article.models.post.PostLike import PostLike, post_like_schema
 
 
 def get_all_post():

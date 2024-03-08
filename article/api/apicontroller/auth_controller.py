@@ -1,9 +1,9 @@
 import sys
 
-from article.models.Role import Role
-from article.models.UserRoles import UserRoles
-from article.models.User import User
-from article.models.User import users_schema, user_schema
+from article.models.user.Role import Role
+from article.models.user.UserRoles import UserRoles
+from article.models.user.User import User
+from article.models.user.User import users_schema, user_schema
 from sqlalchemy import or_, and_
 from flask import jsonify
 

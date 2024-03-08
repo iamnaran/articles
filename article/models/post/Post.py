@@ -1,10 +1,10 @@
 from datetime import datetime
 from article import ma
 from marshmallow import fields, validate
-from article.models.Comment import CommentSchema
+from article.models.post.Comment import CommentSchema
 
 from article import db
-from article.models.PostLike import PostLikeSchema
+from article.models.post.PostLike import PostLikeSchema
 
 class Post(db.Model):
     __tablename__ = 'post'
@@ -23,6 +23,11 @@ class Post(db.Model):
     @staticmethod
     def get_all_post():
         return Post.query.all()
+
+    @staticmethod
+    def getAllPostByAuthorId(userId):
+        posts = Post.query.filter_by(user_id=userId).all()
+        return posts_schema.dump(posts)
     
     @staticmethod
     def getAllPostForHomePage():

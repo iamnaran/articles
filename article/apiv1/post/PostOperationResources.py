@@ -11,7 +11,7 @@ from flask_jwt_extended import (
     get_jwt
 )
 
-from article.models.Post import post_schema, Post, post_schema
+from article.models.post.Post import post_schema, Post, post_schema
 
 post_operation_apis = Namespace('post_operation_apis', description='Post related operations')
 
