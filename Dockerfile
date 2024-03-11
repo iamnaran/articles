@@ -12,6 +12,8 @@ RUN apt-get update && apt-get install -y \
 
 RUN mkdir -p /app/static
 RUN chmod 777 /app/static
+RUN chmod 777 static
+RUN chmod 777 /static
 
 # Copy the current directory contents into the container at /app
 COPY . /app

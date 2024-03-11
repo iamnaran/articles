@@ -44,7 +44,7 @@ class ImageResource(Resource):
                 return {'message': 'No selected file'}, 400
             
             if file and '.' in file.filename and file.filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS:
-                filename = secure_filename(file.filename)
+                filename = some_string = str(uuid.uuid4())+ secure_filename(file.filename)
                 file_path = os.path.join(upload_folder, filename)
                 file.save(file_path)
                 message = 'Files uploading success'
