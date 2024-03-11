@@ -8,7 +8,7 @@ from flask_marshmallow import Marshmallow
 from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate, upgrade
 import os
-
+import psycopg2
 
 from article.config import Config
 

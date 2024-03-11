@@ -17,6 +17,11 @@ from article.apiv1.users.ProfileResource import profile_apis
 from article.apiv1.StoryResources import stories_apis
 from article.apiv1.home.HomeResource import homePageApis
 
+from article.apiv1.chat.ChatBotResource import chatBotApi
+
+
+
+
 
 
 
@@ -44,3 +49,5 @@ api.add_namespace(follow_apis, path='/follow')
 
 api.add_namespace(homePageApis, path='/home')
 api.add_namespace(stories_apis, path='/stories')
+
+api.add_namespace(chatBotApi, path='/chat')
