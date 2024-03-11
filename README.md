@@ -1,9 +1,15 @@
-### A Flask App Example 🔥
-An example app for articles sharing platform in flask.
+### A Flask App  🔥
+A articles sharing platform.
 
 ## Features in API 🔥
-  - Login/Signup - with FlaskJWT
-  - Post a articles
-  - Comment & Like articles
-  - Tags for articles
+
+- Login/Register
+- JWT
+- Forgot/Reset Password
+- Post
+- Likes
+- Comment
+- Follow/Unfollow Users
+- Tags
+- Chat Bots Intent Based [Kera's Model]
 
