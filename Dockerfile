@@ -10,6 +10,8 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+RUN mkdir -p /app/static/uploads && chmod 777 /app/static/uploads
+
 # Copy the current directory contents into the container at /app
 COPY . /app
 

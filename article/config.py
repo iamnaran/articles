@@ -18,7 +18,7 @@ class Config:
     DROPZONE_ALLOWED_FILE_TYPE = 'image/*'
     DROPZONE_REDIRECT_VIEW = 'results'
 
-    UPLOAD_FOLDER = 'static/uploads'
+    UPLOAD_FOLDER = '/app/static/uploads'
     MAX_CONTENT_LENGTH = 2 * 1024 * 1024
     ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
