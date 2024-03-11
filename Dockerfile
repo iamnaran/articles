@@ -16,7 +16,8 @@ COPY . /app
 # Install any needed packages specified in requirements.txt
 RUN pip install -r requirements.txt
 
+# Expose port 8000 to the outside world
+EXPOSE 10000
 
-# Run app.py when the container launches
-CMD ["python3", "app.py"]
-
+# Run the application with Gunicorn
+CMD ["gunicorn", "-b", "0.0.0.0:8000", "app:app"]
