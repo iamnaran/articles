@@ -11,7 +11,9 @@ from flask_jwt_extended import (
     get_jwt
 )
 
+from article.models.post.Tag import tagsSchema, Tag, tagschema
 from article.models.post.Post import post_schema, Post, posts_schema
+
 
 post_apis = Namespace('post_apis', description='Post related operations')
 
@@ -34,9 +36,20 @@ class PostResources(Resource):
             verify_jwt_in_request()
             title = request.form['title']
             content = request.form['content']
+            tags_input = request.form['tags'].split(',')
 
             try:
+                tags = []
+                for tag_name in tags_input:
+                    tag = Tag.query.filter_by(name=tag_name.strip()).first()
+                    if not tag:
+                        tag = Tag(name=tag_name.strip())
+                        db.session.add(tag)
+                    tags.append(tag)
+                
+
                 post = Post(title=title, content=content, user_id=get_jwt_identity())
+                post.tags.extend(tags)
                 db.session.add(post)
                 db.session.commit()
 

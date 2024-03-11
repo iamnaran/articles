@@ -1,10 +1,13 @@
 from datetime import datetime
+from article import db
+
+from article.models.post.Comment import CommentSchema
+from article.models.post.PostLike import PostLikeSchema
+from article.models.post.Tag import Tag
+from article.models.post.PostWithTags import post_tags
+
 from article import ma
 from marshmallow import fields, validate
-from article.models.post.Comment import CommentSchema
-
-from article import db
-from article.models.post.PostLike import PostLikeSchema
 
 class Post(db.Model):
     __tablename__ = 'post'
@@ -14,6 +17,8 @@ class Post(db.Model):
     date_poasted = db.Column(db.DateTime, default=datetime.utcnow)
     content = db.Column(db.Text, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    tags = db.relationship('Tag', secondary=post_tags, backref=db.backref('posts', lazy='dynamic'))
+
     comments = db.relationship('Comment', backref='comments', lazy=True)
     likes = db.relationship('PostLike', backref='likes', lazy=True)
 
@@ -51,7 +56,7 @@ class PostSchema(ma.SQLAlchemyAutoSchema):
     title = fields.String(required=True, help='Title Required.')
     content = fields.String(required=True, help='Content Required.')
     date_poasted = fields.DateTime(dump_only=True)
-    # user_id = fields.Integer()
+    tags = fields.Nested("TagSchema", many=True, only=("id", "name"))
     author = fields.Nested("UserSchema", only=("id", "username", "email",), many=False)
     comments = fields.Nested(CommentSchema, many=True)
     likes = fields.Nested(PostLikeSchema, many=True)
