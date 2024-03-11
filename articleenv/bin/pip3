@@ -1,4 +1,4 @@
-#!/Users/whitewalker/websites/articles/articleenv/bin/python3
+#!/Users/whitewalker/websites/articles/articleenv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys
