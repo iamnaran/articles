@@ -20,4 +20,4 @@ RUN pip install -r requirements.txt
 EXPOSE 10000
 
 # Run the application with Gunicorn
-CMD ["gunicorn", "-b", "0.0.0.0:8000", "app:app"]
+CMD ["gunicorn", "-b", "0.0.0.0:10000", "app:app"]
