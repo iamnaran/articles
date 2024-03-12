@@ -2,7 +2,7 @@ from datetime import datetime
 from article import db
 
 from article.models.post.Comment import CommentSchema
-from article.models.post.PostLike import PostLikeSchema
+from article.models.post.PostLike import PostLike,post_like_schema,post_likes_schema
 from article.models.post.Tag import Tag
 from article.models.post.PostWithTags import post_tags
 
