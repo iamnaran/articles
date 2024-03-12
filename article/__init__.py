@@ -31,11 +31,18 @@ def create_app(conf_class=Config):
     migrate = Migrate(app, db)
 
     with app.app_context():
-            print("---> Table Created")
+        try:            
+            print("---> Creating new tables")
             db.create_all()
+            
+            print("---> Applying migrations")
             migrate.init_app(app, db)
             upgrade()
-
+    
+            print("---> Database migration completed successfully")
+        except Exception as e:
+            print(f"Error occurred during database migration: {str(e)}")
+            db.session.rollback()
     ma.init_app(app)
     bcrypt.init_app(app)
     login_manager.init_app(app)

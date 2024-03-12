@@ -18,7 +18,6 @@ class Post(db.Model):
     content = db.Column(db.Text, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     tags = db.relationship('Tag', secondary=post_tags, backref=db.backref('posts', lazy='dynamic'))
-
     comments = db.relationship('Comment', backref='comments', lazy=True)
     likes = db.relationship('PostLike', backref='likes', lazy=True)
 
@@ -59,7 +58,7 @@ class PostSchema(ma.SQLAlchemyAutoSchema):
     tags = fields.Nested("TagSchema", many=True, only=("id", "name"))
     author = fields.Nested("UserSchema", only=("id", "username", "email",), many=False)
     comments = fields.Nested(CommentSchema, many=True)
-    likes = fields.Nested(PostLikeSchema, many=True)
+    likes = fields.Nested("PostLikeSchema", many=True)
 
 
 post_schema = PostSchema()

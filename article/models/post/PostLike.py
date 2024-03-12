@@ -47,6 +47,7 @@ class PostLikeSchema(ma.SQLAlchemyAutoSchema):
     id = fields.Integer(dump_only=True)
     updated_at = fields.DateTime(required=True)
     liked_by = fields.Nested("UserSchema", only=("id", "username", "email"))
+    clap_count = fields.Integer(dump_only=True)
     post_id = fields.Integer()
 
 

@@ -10,6 +10,7 @@ from article.models.post import Post
 from article.models.user import Follow
 
 from article.models.post.Post import PostSchema
+from article.models.post.PostLike import PostLikeSchema
 from article.models.user.UserRoles import UserRoleSchema
 from article.models.user.Role import RoleSchema
 
@@ -167,6 +168,8 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
     email = fields.Email(required=True, help='Unique Email Required.')
     image_file = fields.String(required=False)
     posts = fields.Nested(PostSchema, many=True)
+    likes = fields.Nested(PostLikeSchema, many=True)
+
 
 
 user_schema = UserSchema(only=("id", "username", "email", "image_file", "user_type", "idToken"))

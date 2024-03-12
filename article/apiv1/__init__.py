@@ -20,8 +20,7 @@ from article.apiv1.image.BaseImageResources import base64_images_apis
 
 from article.apiv1.StoryResources import stories_apis
 from article.apiv1.home.HomeResource import homePageApis
-
-
+from article.apiv1.home.FYPResource import fyp_apis
 
 
 apis = Blueprint('apis', __name__, url_prefix='/api/v1')
@@ -50,3 +49,4 @@ api.add_namespace(follow_apis, path='/follow')
 
 api.add_namespace(homePageApis, path='/home')
 api.add_namespace(stories_apis, path='/stories')
+api.add_namespace(fyp_apis, path='/fyp')
