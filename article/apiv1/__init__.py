@@ -14,9 +14,14 @@ from article.apiv1.users.ProfileResource import profile_apis
 from article.apiv1.post.TagsResource import tags_apis
 
 from article.apiv1.image.ImageResources import images_apis
+from article.apiv1.image.BaseImageResources import base64_images_apis
+
+
 
 from article.apiv1.StoryResources import stories_apis
 from article.apiv1.home.HomeResource import homePageApis
+
+
 
 
 apis = Blueprint('apis', __name__, url_prefix='/api/v1')
@@ -35,6 +40,7 @@ api.add_namespace(comment_operation_apis, path='/comments')
 api.add_namespace(likeapis, path='/likes')
 api.add_namespace(tags_apis, path='/tags')
 api.add_namespace(images_apis, path='/images')
+api.add_namespace(base64_images_apis, path='/image')
 
 
 

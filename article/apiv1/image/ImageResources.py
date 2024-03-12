@@ -5,6 +5,8 @@ import uuid
 import os
 from werkzeug.utils import secure_filename
 from flask import current_app
+from flask import send_from_directory
+
 
 from flask_jwt_extended import (
     verify_jwt_in_request,
@@ -22,7 +24,11 @@ images_apis = Namespace('images_apis', description='File related operations')
 @images_apis.route('/upload')
 @images_apis.doc('Get all post & Create New Post')
 class ImageResource(Resource):
-    """Post Images"""
+    """Get & Post Images"""
+
+    def get(self, filename):
+        return send_from_directory(current_app.config['UPLOAD_FOLDER'], filename)
+
     @staticmethod
     def allowed_file(filename):
         return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
