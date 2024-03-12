@@ -7,8 +7,6 @@ from werkzeug.utils import secure_filename
 from flask import current_app
 from flask import send_from_directory
 
-import cv2
-import numpy as np
 import base64
 
 from article.models.image.BaseImage import BaseImage, baseImageSchema, baseImagesSchema
@@ -36,24 +34,6 @@ class ImageResource(Resource):
     def allowed_file(filename):
         return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
     
-    @staticmethod
-    def optimize_base64_image(base64_data):
-        # Decode base64 data
-        image_data = base64.b64decode(base64_data)
-        
-        nparr = np.frombuffer(image_data, np.uint8)
-        image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)        
-        max_width = 800
-        if image.shape[1] > max_width:
-            aspect_ratio = max_width / image.shape[1]
-            new_height = int(image.shape[0] * aspect_ratio)
-            image = cv2.resize(image, (max_width, new_height), interpolation=cv2.INTER_AREA)
-        
-        _, encoded_image = cv2.imencode('.jpg', image)
-        optimized_base64_data = base64.b64encode(encoded_image).decode('utf-8')
-        
-        return optimized_base64_data
-
 
     def post(self):
         try:
@@ -65,8 +45,7 @@ class ImageResource(Resource):
                 return {'message': 'No selected file'}, 400
             
             if file and self.allowed_file(file.filename):
-                base64_data = base64.b64encode(file.read()).decode('utf-8')
-                optimized_base64_data = self.optimize_base64_image(base64_data)
+                optimized_base64_data = base64.b64encode(file.read()).decode('utf-8')
                 filename = str(uuid.uuid4()) + '.jpg'
                 file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
                 
