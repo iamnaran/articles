@@ -7,7 +7,7 @@ class Config:
     # SQLALCHEMY_DATABASE_URI = 'postgresql://avnadmin:AVNS_zwDNgFyIGrEttm2s5qb@pg-delphic-lab-nrn-66f3.a.aivencloud.com:15151/defaultdb?sslmode=require'
     
     # Production DB
-    SQLALCHEMY_DATABASE_URI = 'postgres://avnadmin:AVNS_Yh5PXdYfbaKx4l25WjX@pg-d67d4e0-nrn-66f3.j.aivencloud.com:15151/defaultdb?sslmode=require'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://avnadmin:AVNS_Yh5PXdYfbaKx4l25WjX@pg-d67d4e0-nrn-66f3.j.aivencloud.com:15151/defaultdb?sslmode=require'
     # SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/articles'
     # SQLALCHEMY_DATABASE_URI = 'sqlite:///article.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
